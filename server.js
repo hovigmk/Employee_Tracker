@@ -21,6 +21,7 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the Employee_db database.`)
 );
+promptMenu();
 
 const promptMenu = () => {
   return inquirer
@@ -36,6 +37,7 @@ const promptMenu = () => {
           "Add a role",
           "Add an employee",
           "Update an employee role",
+          "Exit",
         ],
       },
     ])
@@ -59,8 +61,8 @@ const promptMenu = () => {
         case "Update an employee role":
           updateanemployee();
           break;
-        default:
-          exit();
+        case "Exit":
+          connection.end();
       }
     });
 };
