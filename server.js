@@ -10,18 +10,24 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Connect to database
-const db = mysql.createConnection(
-  {
-    host: "localhost",
-    // MySQL username,
-    user: "root",
-    // TODO: Add MySQL password here
-    password: `${process.env.sqlpass}`,
-    database: "Employee_db",
-  },
-  console.log(`Connected to the Employee_db database.`)
-);
-promptMenu();
+
+const viewalldepartments = () => {
+  app.get("/api/departments", (req, res) => {
+    const sql = `SELECT name AS Departments FROM department`;
+
+    db.query(sql, (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: "success",
+        data: rows,
+      });
+    });
+  });
+  promptMenu();
+};
 
 const promptMenu = () => {
   return inquirer
@@ -66,21 +72,19 @@ const promptMenu = () => {
       }
     });
 };
-
-const viewalldepartments = () => {
-  app.get("/api/departments", (req, res) => {
-    const sql = `SELECT name AS Departments FROM department`;
-
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: "success",
-        data: rows,
-      });
-    });
-  });
+const connection = () => {
+  const db = mysql.createConnection(
+    {
+      host: "localhost",
+      // MySQL username,
+      user: "root",
+      // TODO: Add MySQL password here
+      password: `${process.env.sqlpass}`,
+      database: "Employee_db",
+    },
+    console.log(`Connected to the Employee_db database.`)
+  );
   promptMenu();
 };
+
+connection();
