@@ -2,32 +2,25 @@ const inquirer = require("inquirer");
 const express = require("express");
 const mysql = require("mysql2");
 require("dotenv").config();
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
+require("console.table");
 // Connect to database
 
-const viewalldepartments = () => {
-  app.get("/api/departments", (req, res) => {
-    const sql = `SELECT name AS Departments FROM department`;
-
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: "success",
-        data: rows,
-      });
-    });
-  });
-  promptMenu();
-};
+const db = mysql.createConnection(
+  {
+    host: "localhost",
+    // MySQL username,
+    user: "root",
+    // TODO: Add MySQL password here
+    password: `${process.env.sqlpass}`,
+    database: "Employee_db",
+  },
+  console.log(`Connected to the Employee_db database.`)
+);
+db.connect(function (err) {
+  if (err) {
+    throw err;
+  }
+});
 
 const promptMenu = () => {
   return inquirer
@@ -68,23 +61,36 @@ const promptMenu = () => {
           updateanemployee();
           break;
         case "Exit":
-          connection.end();
+          process.exit();
       }
     });
 };
-const connection = () => {
-  const db = mysql.createConnection(
-    {
-      host: "localhost",
-      // MySQL username,
-      user: "root",
-      // TODO: Add MySQL password here
-      password: `${process.env.sqlpass}`,
-      database: "Employee_db",
-    },
-    console.log(`Connected to the Employee_db database.`)
-  );
-  promptMenu();
+const viewalldepartments = () => {
+  const sql = `SELECT * FROM department`;
+
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("\n");
+      console.table(rows);
+      promptMenu();
+    }
+  });
 };
 
-connection();
+const viewallroles = () => {
+  const sql = `SELECT role.id, role.title, role.salary, department.name AS Department FROM role JOIN department ON role.department_id=department.id;`;
+
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("\n");
+      console.table(rows);
+      promptMenu();
+    }
+  });
+};
+
+promptMenu();
