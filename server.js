@@ -94,7 +94,10 @@ const viewallroles = () => {
 };
 
 const viewallemployees = () => {
-  const sql = ` SELECT employee.first_name AS Name, employee.last_name AS Surname, role.title AS Title, manager_id FROM employee JOIN role ON employee.role_id = role.id;`;
+  const sql = ` SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee 
+  LEFT JOIN role on employee.role_id = role.id 
+  LEFT JOIN department on role.department_id = department.id 
+  LEFT JOIN employee manager on manager.id = employee.manager_id;`;
 
   db.query(sql, (err, rows) => {
     if (err) {
