@@ -93,4 +93,17 @@ const viewallroles = () => {
   });
 };
 
+const viewallemployees = () => {
+  const sql = ` SELECT employee.first_name AS Name, employee.last_name AS Surname, role.title AS Title, manager_id FROM employee JOIN role ON employee.role_id = role.id;`;
+
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("\n");
+      console.table(rows);
+      promptMenu();
+    }
+  });
+};
 promptMenu();
