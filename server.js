@@ -94,7 +94,8 @@ const viewallroles = () => {
 };
 
 const viewallemployees = () => {
-  const sql = ` SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee 
+  const sql = ` SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, 
+  CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee 
   LEFT JOIN role on employee.role_id = role.id 
   LEFT JOIN department on role.department_id = department.id 
   LEFT JOIN employee manager on manager.id = employee.manager_id;`;
@@ -108,5 +109,42 @@ const viewallemployees = () => {
       promptMenu();
     }
   });
+};
+
+const addarole = () => {
+  return inquirer.prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "What is your firstname?",
+      validate: (nameInput) => {
+        if (nameInput) {
+          return true;
+        } else {
+          console.log("Please enter your firstname");
+          return false;
+        }
+      },
+    },
+    {
+      type: "input",
+      name: "lastname",
+      message: "Enter your lastname?",
+      validate: (lastinput) => {
+        if (lastinput) {
+          return true;
+        } else {
+          console.log("Please enter your lastname");
+          return false;
+        }
+      },
+    },
+    {
+      type: "list",
+      name: "menu",
+      message: "Do you have a manager",
+      choices: ["Yes", "No"],
+    },
+  ]);
 };
 promptMenu();
