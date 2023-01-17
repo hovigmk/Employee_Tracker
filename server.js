@@ -125,9 +125,9 @@ const viewmanagers = () => {
       managers = [];
       // console.log("\n");
       // console.table(rows);
-      for (let i = 0; rows.length; i++) {
-        console.log(rows);
-        console.log(rows[i].first_name);
+      for (let i = 0; i < rows.length; i++) {
+        // console.log(rows);
+        // console.log(rows[i].first_name);
         const firstName = rows[i].first_name;
         const lastName = rows[i].last_name;
         const manager_id = rows[i].id;
@@ -137,50 +137,55 @@ const viewmanagers = () => {
         };
         managers.push(newManager);
       }
-      console.log(managers);
       return managers;
+      // console.log(managers);
+      // inquirer.prompt([
+      //   {
+      //     type: "list",
+      //     name: "managers",
+      //     message: "Pick a manager",
+      //     choices: managers,
+      //   },
+      // ]);
     }
   });
 };
 
 const addanemployee = () => {
-  return inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "What is your firstname?",
-        validate: (nameInput) => {
-          if (nameInput) {
-            return true;
-          } else {
-            console.log("Please enter your firstname");
-            return false;
-          }
-        },
+  managers.push = "none";
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "What is your firstname?",
+      validate: (nameInput) => {
+        if (nameInput) {
+          return true;
+        } else {
+          console.log("Please enter your firstname");
+          return false;
+        }
       },
-      {
-        type: "input",
-        name: "lastname",
-        message: "Enter your lastname?",
-        validate: (lastinput) => {
-          if (lastinput) {
-            return true;
-          } else {
-            console.log("Please enter your lastname");
-            return false;
-          }
-        },
+    },
+    {
+      type: "input",
+      name: "lastname",
+      message: "Enter your lastname?",
+      validate: (lastinput) => {
+        if (lastinput) {
+          return true;
+        } else {
+          console.log("Please enter your lastname");
+          return false;
+        }
       },
-      //   {
-      //     type: "list",
-      //     name: "menu",
-      //     message: "Do you have a manager",
-      //     choices: managers,
-      //   },
-    ])
-    .then((answers) => {
-      viewmanagers();
-    });
+    },
+    {
+      type: "list",
+      name: "manager",
+      message: "Do you have a manager",
+      choices: managers,
+    },
+  ]);
 };
 promptMenu();
