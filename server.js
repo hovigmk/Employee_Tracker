@@ -152,6 +152,7 @@ const viewmanagers = () => {
 };
 
 const addanemployee = () => {
+  const managerview = viewmanagers();
   managers.push = "none";
   inquirer.prompt([
     {
@@ -184,7 +185,7 @@ const addanemployee = () => {
       type: "list",
       name: "manager",
       message: "Do you have a manager",
-      choices: managers,
+      choices: managerview,
     },
   ]);
 };
