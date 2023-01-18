@@ -149,7 +149,7 @@ const viewroles = () => {
         //  const lastName = rows[i].last_name;
         const role_id = rows[i].role_id;
         var selectrole = {
-          position: `${role}`,
+          name: `${role}`,
           value: role_id,
         };
 
