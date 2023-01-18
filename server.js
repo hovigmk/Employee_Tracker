@@ -117,12 +117,13 @@ const viewmanagers = () => {
   LEFT JOIN role on employee.role_id = role.id 
   LEFT JOIN department on role.department_id = department.id 
   LEFT JOIN employee manager on manager.id = employee.manager_id;`;
+  let managers = [];
   db.query(sql, (err, rows) => {
     if (err) {
       console.log(err);
     } else {
       //console.log(rows);
-      managers = [];
+
       // console.log("\n");
       // console.table(rows);
       for (let i = 0; i < rows.length; i++) {
@@ -137,56 +138,62 @@ const viewmanagers = () => {
         };
         managers.push(newManager);
       }
-      return managers;
-      // console.log(managers);
-      // inquirer.prompt([
-      //   {
-      //     type: "list",
-      //     name: "managers",
-      //     message: "Pick a manager",
-      //     choices: managers,
-      //   },
-      // ]);
     }
+  });
+  return managers;
+};
+
+const addingEmployeeSQL = (first_Name, last_Name, manager_Id) => {
+  const sql =
+    "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
+  db.query(sql, [first_Name, last_Name, manager_Id], (err, rows) => {
+    if (err) throw err;
   });
 };
 
 const addanemployee = () => {
-  const managerview = viewmanagers();
-  managers.push = "none";
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "name",
-      message: "What is your firstname?",
-      validate: (nameInput) => {
-        if (nameInput) {
-          return true;
-        } else {
-          console.log("Please enter your firstname");
-          return false;
-        }
+  const managers = viewmanagers();
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "firstname",
+        message: "What is your firstname?",
+        validate: (nameInput) => {
+          if (nameInput) {
+            return true;
+          } else {
+            console.log("Please enter your firstname");
+            return false;
+          }
+        },
       },
-    },
-    {
-      type: "input",
-      name: "lastname",
-      message: "Enter your lastname?",
-      validate: (lastinput) => {
-        if (lastinput) {
-          return true;
-        } else {
-          console.log("Please enter your lastname");
-          return false;
-        }
+      {
+        type: "input",
+        name: "lastname",
+        message: "Enter your lastname?",
+        validate: (lastinput) => {
+          if (lastinput) {
+            return true;
+          } else {
+            console.log("Please enter your lastname");
+            return false;
+          }
+        },
       },
-    },
-    {
-      type: "list",
-      name: "manager",
-      message: "Do you have a manager",
-      choices: managerview,
-    },
-  ]);
+      {
+        type: "list",
+        name: "managers",
+        message: "Do you have a manager",
+        choices: managers,
+      },
+    ])
+    .then((answers) => {
+      let managerId = answers.managers;
+      let firstname = answers.firstname;
+      let lastname = answers.lastname;
+      addingEmployeeSQL(firstname, lastname, managerId);
+      console.log("Employee added to the table");
+    });
 };
 promptMenu();
