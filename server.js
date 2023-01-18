@@ -33,6 +33,7 @@ const promptMenu = () => {
           "View all departments",
           "View all employees",
           "View all roles",
+          "Add a Department",
           "Add a role",
           "Add an employee",
           "Update an employee role",
@@ -50,6 +51,9 @@ const promptMenu = () => {
           break;
         case "View all roles":
           viewallroles();
+          break;
+        case "Add a Department":
+          addingDepartment();
           break;
         case "Add a role":
           addarole();
@@ -138,7 +142,7 @@ const viewmanagers = () => {
 };
 
 const viewroles = () => {
-  const sql = `SELECT role.title, employee.role_id FROM role JOIN employee ON role.department_id = employee.role_id;`;
+  const sql = `SELECT * FROM role;`;
   let roles = [];
   db.query(sql, (err, rows) => {
     if (err) {
@@ -147,7 +151,7 @@ const viewroles = () => {
       for (let i = 0; i < rows.length; i++) {
         const role = rows[i].title;
         //  const lastName = rows[i].last_name;
-        const role_id = rows[i].role_id;
+        const role_id = rows[i].id;
         var selectrole = {
           name: `${role}`,
           value: role_id,
@@ -223,6 +227,36 @@ const addanemployee = () => {
       let lastname = answers.lastname;
       addingEmployeeSQL(firstname, lastname, roleId, managerId);
       console.log("Employee added to the table");
+    });
+};
+
+const addingDepartment = () => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "department",
+        message: "Please enter the new department's name?",
+        validate: (departmentInput) => {
+          if (departmentInput) {
+            return true;
+          } else {
+            console.log("Please enter a department name");
+            return false;
+          }
+        },
+      },
+    ])
+    .then((answer) => {
+      const sql = `INSERT INTO department(name) VALUES ('${answer.department}');`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("department added");
+          promptMenu();
+        }
+      });
     });
 };
 promptMenu();
