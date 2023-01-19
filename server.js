@@ -3,7 +3,10 @@ const express = require("express");
 const mysql = require("mysql2");
 require("dotenv").config();
 require("console.table");
+//const department = require("./lib/department");
 // Connect to database
+
+//department();
 
 const db = mysql.createConnection(
   {
@@ -165,6 +168,30 @@ const viewroles = () => {
   return roles;
 };
 
+const viewdepartments = () => {
+  const sql = `SELECT * FROM department;`;
+  let departments = [];
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.log(err);
+    } else {
+      for (let i = 0; i < rows.length; i++) {
+        const department = rows[i].name;
+        //  const lastName = rows[i].last_name;
+        const department_id = rows[i].id;
+        var selectdepartment = {
+          name: `${department}`,
+          value: department_id,
+        };
+
+        departments.push(selectdepartment);
+        // console.log(roles);
+      }
+    }
+  });
+  return departments;
+};
+
 const addingEmployeeSQL = (first_Name, last_Name, role_Id, manager_Id) => {
   const sql =
     "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
@@ -254,6 +281,56 @@ const addingDepartment = () => {
           console.log(err);
         } else {
           console.log("department added");
+          promptMenu();
+        }
+      });
+    });
+};
+
+const addarole = () => {
+  const departments = viewdepartments();
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "rolename",
+        message: "What is the role's name?",
+        validate: (nameInput) => {
+          if (nameInput) {
+            return true;
+          } else {
+            console.log("Please enter a role name");
+            return false;
+          }
+        },
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "How much is the role's salary?",
+        validate: (nameInput) => {
+          if (nameInput) {
+            return true;
+          } else {
+            console.log("Please enter a salary");
+            return false;
+          }
+        },
+      },
+      {
+        type: "list",
+        name: "department",
+        message: "What is the role's department?",
+        choices: departments,
+      },
+    ])
+    .then((answer) => {
+      const sql = `INSERT INTO role(title, salary, department_id ) VALUES ('${answer.rolename}' '${answer.salary}' '${answer.department}');`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("role added");
           promptMenu();
         }
       });

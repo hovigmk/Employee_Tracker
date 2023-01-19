@@ -1,8 +1,8 @@
 SET FOREIGN_KEY_CHECKS=0;
-INSERT INTO department (name)
-VALUES ("Finance"),
-       ("Legal Services"),
-       ("Human Resources");
+INSERT INTO department (id, name)
+VALUES (1 ,"Finance"),
+       (2 ,"Legal Services"),
+       (3 ,"Human Resources");
       
 
 INSERT INTO role (title, salary, department_id)
