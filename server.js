@@ -63,7 +63,7 @@ const promptMenu = () => {
           addanemployee();
           break;
         case "Update an employee role":
-          updateanemployee();
+          updateanemployeeRole();
           break;
         case "Exit":
           process.exit();
@@ -353,34 +353,102 @@ const addarole = () => {
     });
 };
 
-const updateanemployee = () => {
-  const employees = viewmanagers();
-  const roles = viewroles();
-  inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "employees",
-        message: "Please choose an employee name to update?",
-        choices: employees,
-      },
-      {
-        type: "list",
-        name: "rolelist",
-        message: "Please choose the updated role?",
-        choices: roles,
-      },
-    ])
-    .then((answer) => {
-      const sql = `UPDATE employee SET role_id = ${answer.rolelist} WHERE id = ${answer.employees};`;
-      db.query(sql, (err, rows) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("employee updated");
-          promptMenu();
-        }
+// Find all employees, join with roles and departments to display their roles, salaries, departments, and managers - returns a promise
+function findEmployees() {
+  return db
+    .promise()
+    .query(
+      "SELECT employee. id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT (manager.first_name,' ' ,manager. last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;"
+    );
+  //Find all roles, join with departments to display the department
+  // name, returns a promise
+}
+function findRoles() {
+  return db
+    .promise()
+    .query(
+      "SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department on role.department_id = department. id;"
+    );
+}
+// Update the given employee's role, returns a promise
+function updateEmpRole(employeeId, roleId) {
+  return db
+    .promise()
+    .query("UPDATE employee SET role_id = ? WHERE id = ?", [
+      roleId,
+      employeeId,
+    ]);
+}
+function updateanemployeeRole() {
+  findEmployees().then(([rows]) => {
+    let employees = rows;
+    const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name}`,
+      value: id,
+    }));
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employeeld",
+          message: "Which employee's role do you want to update?",
+          choices: employeeChoices,
+        },
+      ])
+      .then((res) => {
+        let employeeId = res.employeeId;
+        findRoles().then(([rows]) => {
+          let roles = rows;
+          const roleChoices = roles.map(({ id, title }) => ({
+            name: title,
+            value: id,
+          }));
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                name: "roleld",
+                message:
+                  "Which role do you want to assign the selected employee?",
+                choices: roleChoices,
+              },
+            ])
+            .then((res) => updateEmpRole(employeeId, res.roleId))
+            .then(() => console.log("Updated employee's role"))
+            .then(() => promptMenu());
+        });
       });
-    });
-};
+  });
+}
+
+// const updateanemployee = () => {
+//   const employees = viewmanagers();
+//   const roles = viewroles();
+//   inquirer
+//     .prompt([
+//       {
+//         type: "list",
+//         name: "employees",
+//         message: "Please choose an employee name to update?",
+//         choices: employees,
+//       },
+//       {
+//         type: "list",
+//         name: "rolelist",
+//         message: "Please choose the updated role?",
+//         choices: roles,
+//       },
+//     ])
+//     .then((answer) => {
+//       const sql = `UPDATE employee SET role_id = ${answer.rolelist} WHERE id = ${answer.employees};`;
+//       db.query(sql, (err, rows) => {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           console.log("employee updated");
+//           promptMenu();
+//         }
+//       });
+//     });
+// };
 promptMenu();
