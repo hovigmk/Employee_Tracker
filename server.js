@@ -3,10 +3,8 @@ const express = require("express");
 const mysql = require("mysql2");
 require("dotenv").config();
 require("console.table");
-//const department = require("./lib/department");
-// Connect to database
 
-//department();
+// Connect to database
 
 const db = mysql.createConnection(
   {
@@ -144,6 +142,27 @@ const viewmanagers = () => {
   return managers;
 };
 
+// const viewemployees = () => {
+//   const sql = `SELECT * FROM employee;`;
+//   let employees = [];
+//   db.query(sql, (err, rows) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       for (let i = 0; i < rows.length; i++) {
+//         const firstName = rows[i].first_name;
+//         const lastName = rows[i].last_name;
+//         const employee_id = rows[i].id;
+//         var employee = {
+//           name: `${firstName} ${lastName}`,
+//           value: employee_id,
+//         };
+//         employees.push(employee);
+//       }
+//     }
+//   });
+//   return employees;
+// };
 const viewroles = () => {
   const sql = `SELECT * FROM role;`;
   let roles = [];
@@ -203,8 +222,6 @@ const addingEmployeeSQL = (first_Name, last_Name, role_Id, manager_Id) => {
 const addanemployee = () => {
   const managers = viewmanagers();
   const roles = viewroles();
-  // console.log(managers);
-  // console.log(roles);
   inquirer
     .prompt([
       {
@@ -247,7 +264,6 @@ const addanemployee = () => {
       },
     ])
     .then((answers) => {
-      console.log(roles);
       let roleId = answers.roles;
       let managerId = answers.managers;
       let firstname = answers.firstname;
@@ -331,6 +347,37 @@ const addarole = () => {
           console.log(err);
         } else {
           console.log("role added");
+          promptMenu();
+        }
+      });
+    });
+};
+
+const updateanemployee = () => {
+  const employees = viewmanagers();
+  const roles = viewroles();
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "employees",
+        message: "Please choose an employee name to update?",
+        choices: employees,
+      },
+      {
+        type: "list",
+        name: "rolelist",
+        message: "Please choose the updated role?",
+        choices: roles,
+      },
+    ])
+    .then((answer) => {
+      const sql = `UPDATE employee SET role_id = ${answer.rolelist} WHERE id = ${answer.employees};`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("employee updated");
           promptMenu();
         }
       });
