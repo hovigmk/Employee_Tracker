@@ -325,7 +325,7 @@ const addarole = () => {
       },
     ])
     .then((answer) => {
-      const sql = `INSERT INTO role(title, salary, department_id ) VALUES ('${answer.rolename}' '${answer.salary}' '${answer.department}');`;
+      const sql = `INSERT INTO role(title, salary, department_id ) VALUES ('${answer.rolename}', '${answer.salary}', '${answer.department}');`;
       db.query(sql, (err, rows) => {
         if (err) {
           console.log(err);
